@@ -1,21 +1,31 @@
-FROM php:8.3-fpm
+FROM php:8.3-fpm-alpine
 
-RUN apt-get update && apt-get install -y \
-    libcurl4-openssl-dev \
-    libpq-dev \
-    libzip-dev \
-    unzip \
-    git \
-    && docker-php-ext-install pdo pdo_pgsql zip \
-    && apt-get clean && rm -rf /var/lib/apt/lists/*
+RUN apk update && apk add \
+    build-base \
+    nano \
+    bash \
+    curl \
+    postgresql-dev
 
-COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
+RUN curl -sSLf \
+            -o /usr/local/bin/install-php-extensions \
+            https://github.com/mlocati/docker-php-extension-installer/releases/latest/download/install-php-extensions
+
+RUN chmod +x /usr/local/bin/install-php-extensions
+RUN install-php-extensions \
+    pdo \
+    pdo_pgsql \
+    zip \
+    gd \
+    intl
+
+RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 
 WORKDIR /var/www
 
 COPY . .
 
-RUN composer require laravel/sanctum
+RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 
 EXPOSE 8000
 

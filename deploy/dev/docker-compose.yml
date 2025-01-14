@@ -18,9 +18,9 @@ services:
 
   frontend:
     build:
-      context: .
-      dockerfile: node/Dockerfile
-    container_name: frontend
+      context: ../..
+      dockerfile: deploy/dev/node/Dockerfile
+    container_name: frontend_dev
     volumes:
       - ../../frontend:/app
     ports:
@@ -37,9 +37,9 @@ services:
 
   backend:
     build:
-      context: .
-      dockerfile: php/Dockerfile
-    container_name: backend
+      context: ../..
+      dockerfile: deploy/dev/php/Dockerfile
+    container_name: backend_dev
     networks:
       - app-network
     ports:
